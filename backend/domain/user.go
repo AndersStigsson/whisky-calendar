@@ -5,7 +5,7 @@ import "context"
 type User struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
-	Password string `json:"password"`
+	Password string `json:"-"`
 	Name     string `json:"name"`
 }
 
