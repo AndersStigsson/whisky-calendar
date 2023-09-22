@@ -55,7 +55,7 @@ func main() {
 	})
 
 	router.GET("/whiskies", whiskyController.GetAllWhiskies)
-	router.GET("/whisky/:id", whiskyController.GetWhiskyByID)
+	router.GET("/whisky/{id}", whiskyController.GetWhiskyByID)
 
 	router.SERVE(":42069")
 }

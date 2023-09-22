@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/AndersStigsson/whisky-calendar/delivery/router"
 	"github.com/AndersStigsson/whisky-calendar/domain"
@@ -38,7 +39,8 @@ func (wc *whiskyController) GetAllWhiskies(w http.ResponseWriter, r *http.Reques
 func (wc *whiskyController) GetWhiskyByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	id, _ := wc.router.ParsePathVariable(r, "id")
-	ww, _ := wc.service.GetByID(wc.ctx, id.(int64))
+	idint, _ := strconv.ParseInt(id.(string), 10, 64)
+	ww, _ := wc.service.GetByID(wc.ctx, idint)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(ww)
 }
