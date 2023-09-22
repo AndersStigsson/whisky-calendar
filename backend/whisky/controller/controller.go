@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/AndersStigsson/whisky-calendar/delivery/router"
@@ -32,7 +31,6 @@ func (wc *whiskyController) GetAllWhiskies(w http.ResponseWriter, r *http.Reques
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(errors.New("Couldn't fetch anything"))
 	}
-	fmt.Printf("%v\n", ww)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(ww)
 }
