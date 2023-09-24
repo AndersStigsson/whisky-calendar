@@ -8,10 +8,25 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
+	calendarDateController "github.com/AndersStigsson/whisky-calendar/calendardate/controller"
+	calendarDateRepository "github.com/AndersStigsson/whisky-calendar/calendardate/repository"
+	calendarDateUseCase "github.com/AndersStigsson/whisky-calendar/calendardate/usecase"
+	commentController "github.com/AndersStigsson/whisky-calendar/comment/controller"
+	commentRepository "github.com/AndersStigsson/whisky-calendar/comment/repository"
+	commentUseCase "github.com/AndersStigsson/whisky-calendar/comment/usecase"
 	"github.com/AndersStigsson/whisky-calendar/delivery/router"
-	"github.com/AndersStigsson/whisky-calendar/whisky/controller"
-	"github.com/AndersStigsson/whisky-calendar/whisky/repository"
-	"github.com/AndersStigsson/whisky-calendar/whisky/usecase"
+	distilleryController "github.com/AndersStigsson/whisky-calendar/distillery/controller"
+	distilleryRepository "github.com/AndersStigsson/whisky-calendar/distillery/repository"
+	distilleryUseCase "github.com/AndersStigsson/whisky-calendar/distillery/usecase"
+	regionController "github.com/AndersStigsson/whisky-calendar/region/controller"
+	regionRepository "github.com/AndersStigsson/whisky-calendar/region/repository"
+	regionUseCase "github.com/AndersStigsson/whisky-calendar/region/usecase"
+	userController "github.com/AndersStigsson/whisky-calendar/user/controller"
+	userRepository "github.com/AndersStigsson/whisky-calendar/user/repository"
+	userUseCase "github.com/AndersStigsson/whisky-calendar/user/usecase"
+	whiskyController "github.com/AndersStigsson/whisky-calendar/whisky/controller"
+	whiskyRepository "github.com/AndersStigsson/whisky-calendar/whisky/repository"
+	whiskyUseCase "github.com/AndersStigsson/whisky-calendar/whisky/usecase"
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
 )
@@ -46,16 +61,47 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err.Error())
 	}
-	whiskyRepository := repository.NewMySQLWhiskyRepository(db)
-	whiskyUseCase := usecase.NewWhiskyUseCase(&whiskyRepository)
 	router := router.NewMuxRouter()
-	whiskyController := controller.NewWhiskyController(whiskyUseCase, ctx, router)
+
+	whiskyRepository := whiskyRepository.NewMySQLWhiskyRepository(db)
+	whiskyUseCase := whiskyUseCase.NewWhiskyUseCase(&whiskyRepository)
+	whiskyController := whiskyController.NewWhiskyController(whiskyUseCase, ctx, router)
+
+	calendarDateRepository := calendarDateRepository.NewMySQLCalendarDateRepository(db)
+	cduc := calendarDateUseCase.NewCalendarDateUseCase(&calendarDateRepository)
+	cdc := calendarDateController.NewWhiskyController(cduc, ctx, router)
+
+	regionRepo := regionRepository.New(db)
+	ruc := regionUseCase.New(&regionRepo)
+	rc := regionController.New(ruc, ctx, router)
+
+	dr := distilleryRepository.New(db)
+	duc := distilleryUseCase.New(&dr)
+	dc := distilleryController.New(duc, ctx, router)
+
+	cr := commentRepository.New(db)
+	cuc := commentUseCase.New(&cr)
+	cc := commentController.New(cuc, ctx, router)
+
+	ur := userRepository.NewMySQL(db)
+	uuc := userUseCase.New(&ur)
+	uc := userController.New(uuc, ctx, router)
+
 	router.GET("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Up and running...")
 	})
 
 	router.GET("/whiskies", whiskyController.GetAllWhiskies)
 	router.GET("/whisky/{id}", whiskyController.GetWhiskyByID)
+	router.GET("/calendar", cdc.GetAllDates)
+	router.GET("/calendar/{day}", cdc.GetDateByDayOfMonth)
+	router.GET("/region/{id}", rc.GetRegionByID)
+	router.GET("/distillery/{id}", dc.GetDistilleryByID)
+	router.GET("/comments/{id}", cc.GetCommentByID)
+	router.GET("/whisky/{whiskyId}/comments", cc.GetCommentsByWhiskyID)
+	router.POST("/comments", cc.StoreComment)
+	router.POST("/user/register", uc.Register)
+	router.POST("/user/login", uc.Login)
 
 	router.SERVE(":42069")
 }

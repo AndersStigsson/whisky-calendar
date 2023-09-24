@@ -23,12 +23,12 @@ type WhiskyUseCase interface {
 	// Delete(ctx context.Context, id int64) error
 }
 
-type Storer interface {
+type WhiskyStorer interface {
 	Update(ctx context.Context, whisky *Whisky) error
 	Store(context.Context, *Whisky) error
 }
 
-type Getter interface {
+type WhiskyGetter interface {
 	Fetch(ctx context.Context) ([]*Whisky, error)
 	GetByID(ctx context.Context, id int64) (*Whisky, error)
 }
@@ -39,7 +39,7 @@ type Deleter interface {
 
 type WhiskyRepository interface {
 	// Storer
-	Getter
+	WhiskyGetter
 	// Deleter
 }
 
@@ -48,14 +48,15 @@ type WhiskyController interface {
 	GetWhiskyByID(w http.ResponseWriter, r *http.Request)
 }
 
-func NewWhisky(id int64, name string, abv int, link string, description string, title string) (*Whisky, error) {
+func NewWhisky(id int64, name string, abv int, link string, description string, title string, distilleryId int) (*Whisky, error) {
 	w := &Whisky{
-		ID:          id,
-		Name:        name,
-		ABV:         abv,
-		Link:        link,
-		Description: description,
-		Title:       title,
+		ID:           id,
+		Name:         name,
+		ABV:          abv,
+		Link:         link,
+		Description:  description,
+		Title:        title,
+		DistilleryId: distilleryId,
 	}
 
 	return w, nil

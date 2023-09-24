@@ -88,5 +88,6 @@ func (w *WhiskyModel) TranslateToDomain() (*domain.Whisky, error) {
 		w.Link,
 		w.Description,
 		w.Title,
+		w.DistilleryId,
 	)
 }

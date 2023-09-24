@@ -1,10 +1,20 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"net/http"
+)
 
 type Region struct {
-	ID   int    `json:"id"`
+	ID   int64  `json:"id"`
 	Name string `json:"name"`
+}
+
+func NewRegion(id int64, name string) *Region {
+	return &Region{
+		ID:   id,
+		Name: name,
+	}
 }
 
 type RegionUseCase interface {
@@ -13,4 +23,8 @@ type RegionUseCase interface {
 
 type RegionRepository interface {
 	GetByID(ctx context.Context, id int64) (*Region, error)
+}
+
+type RegionController interface {
+	GetRegionByID(w http.ResponseWriter, r *http.Request)
 }

@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -37,4 +38,9 @@ func (*muxRouter) ParsePathVariable(r *http.Request, name string) (interface{}, 
 	}
 
 	return returnValue, nil
+}
+
+func (*muxRouter) GetBody(r *http.Request) ([]byte, error) {
+	reqBody, _ := io.ReadAll(r.Body)
+	return reqBody, nil
 }
