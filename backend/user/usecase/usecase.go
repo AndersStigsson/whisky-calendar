@@ -31,8 +31,8 @@ func (uc *userUseCase) Login(ctx context.Context, user *domain.User) error {
 }
 
 func (uc *userUseCase) Register(ctx context.Context, user *domain.User) error {
-	dbUser, _ := uc.repo.GetByUsername(ctx, user.Username)
-	if dbUser != nil {
+	dbUser, err := uc.repo.GetByUsername(ctx, user.Username)
+	if dbUser != nil || err == nil {
 		return errors.New("Username is already taken")
 	}
 

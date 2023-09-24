@@ -15,7 +15,7 @@ const (
 	SELECT 
 		users.id,
 		users.username,
-		users.password,
+		users.password
 	FROM users
 	WHERE users.username = (?)
 	`

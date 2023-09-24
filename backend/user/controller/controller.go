@@ -72,7 +72,7 @@ func (c *userController) Register(w http.ResponseWriter, r *http.Request) {
 	err = c.service.Register(c.ctx, dest.TranslateToDomain())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err)
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 	json.NewEncoder(w).Encode("Registered")
