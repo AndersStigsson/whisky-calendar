@@ -44,11 +44,11 @@ func (r *userRepository) GetByUsername(ctx context.Context, username string) (*d
 	return um.TranslateToDomain()
 }
 
-func (r *userRepository) Store(ctx context.Context, user *domain.User) error {
+func (r *userRepository) Store(ctx context.Context, user *domain.User) (*domain.User, error) {
 	u := &UserModel{}
 	password, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if err := r.db.QueryRowxContext(
 		ctx,
@@ -57,10 +57,10 @@ func (r *userRepository) Store(ctx context.Context, user *domain.User) error {
 		password,
 		user.Name,
 	).StructScan(u); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return u.TranslateToDomain()
 }
 
 func (um *UserModel) TranslateToDomain() (*domain.User, error) {

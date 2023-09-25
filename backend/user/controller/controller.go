@@ -8,6 +8,7 @@ import (
 
 	"github.com/AndersStigsson/whisky-calendar/delivery/router"
 	"github.com/AndersStigsson/whisky-calendar/domain"
+	"github.com/AndersStigsson/whisky-calendar/token"
 )
 
 type userController struct {
@@ -31,6 +32,11 @@ type userBodyModel struct {
 	Name     string `json:"name,omitempty"`
 }
 
+type userReturnModel struct {
+	User  *domain.User `json:"user"`
+	Token string       `json:"token"`
+}
+
 func (c *userController) Login(w http.ResponseWriter, r *http.Request) {
 	var dest userBodyModel
 	bodyBytes, err := c.router.GetBody(r)
@@ -46,13 +52,18 @@ func (c *userController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.service.Login(c.ctx, dest.TranslateToDomain())
+	u, err := c.service.Login(c.ctx, dest.TranslateToDomain())
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(errors.New("Incorrect username or password"))
 		return
 	}
-	json.NewEncoder(w).Encode("Login Succeeded")
+	token, _ := token.GenerateJWTToken(u)
+	userWithToken := userReturnModel{
+		User:  u,
+		Token: token,
+	}
+	json.NewEncoder(w).Encode(userWithToken)
 }
 
 func (c *userController) Register(w http.ResponseWriter, r *http.Request) {
@@ -69,13 +80,18 @@ func (c *userController) Register(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(errors.New("Unable to unmarshal body"))
 		return
 	}
-	err = c.service.Register(c.ctx, dest.TranslateToDomain())
+	u, err := c.service.Register(c.ctx, dest.TranslateToDomain())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
-	json.NewEncoder(w).Encode("Registered")
+	token, _ := token.GenerateJWTToken(u)
+	userWithToken := userReturnModel{
+		User:  u,
+		Token: token,
+	}
+	json.NewEncoder(w).Encode(userWithToken)
 }
 
 func (u *userBodyModel) TranslateToDomain() *domain.User {

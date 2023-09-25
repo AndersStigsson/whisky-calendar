@@ -18,6 +18,7 @@ import (
 	distilleryController "github.com/AndersStigsson/whisky-calendar/distillery/controller"
 	distilleryRepository "github.com/AndersStigsson/whisky-calendar/distillery/repository"
 	distilleryUseCase "github.com/AndersStigsson/whisky-calendar/distillery/usecase"
+	"github.com/AndersStigsson/whisky-calendar/middlewares"
 	regionController "github.com/AndersStigsson/whisky-calendar/region/controller"
 	regionRepository "github.com/AndersStigsson/whisky-calendar/region/repository"
 	regionUseCase "github.com/AndersStigsson/whisky-calendar/region/usecase"
@@ -91,7 +92,7 @@ func main() {
 		fmt.Fprintln(w, "Up and running...")
 	})
 
-	router.GET("/whiskies", whiskyController.GetAllWhiskies)
+	router.GET("/whiskies", middlewares.VerifyJWTToken(whiskyController.GetAllWhiskies))
 	router.GET("/whisky/{id}", whiskyController.GetWhiskyByID)
 	router.GET("/calendar", cdc.GetAllDates)
 	router.GET("/calendar/{day}", cdc.GetDateByDayOfMonth)

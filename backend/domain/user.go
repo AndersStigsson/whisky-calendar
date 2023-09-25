@@ -24,13 +24,13 @@ func NewUser(id int64, username string, password string, name string) *User {
 type UserRepository interface {
 	GetByID(ctx context.Context, id int64) (*User, error)
 	// Login(ctx context.Context, username string, password string) error
-	Store(ctx context.Context, user *User) error
+	Store(ctx context.Context, user *User) (*User, error)
 	GetByUsername(ctx context.Context, username string) (*User, error)
 }
 
 type UserUseCase interface {
-	Login(ctx context.Context, user *User) error
-	Register(ctx context.Context, user *User) error
+	Login(ctx context.Context, user *User) (*User, error)
+	Register(ctx context.Context, user *User) (*User, error)
 }
 
 type UserController interface {
